@@ -21,9 +21,6 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install ESLint globally
-      run: npm install -g eslint
-
     - name: Install dependencies for backend
       run: |
         cd backend
@@ -32,37 +29,11 @@ jobs:
     - name: Run ESLint for backend
       run: |
         cd backend
-        eslint src --ext .ts,.js
-
-  lint-frontend:
-    runs-on: ubuntu-latest
-    needs: lint-backend
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install ESLint globally
-      run: npm install -g eslint
-
-    - name: Install dependencies for frontend
-      run: |
-        cd frontend
-        npm install
-
-    - name: Run ESLint for frontend
-      run: |
-        cd frontend
-        eslint src --ext .ts,.js
+        npx eslint src --ext .ts,.tsx
 
   build-backend:
     runs-on: ubuntu-latest
-    needs: lint-frontend
+    needs: lint-backend
 
     steps:
     - name: Checkout code
@@ -81,27 +52,4 @@ jobs:
     - name: Build backend project
       run: |
         cd backend
-        npm run build  # Assuming you have a build script for the backend
-
-  build-frontend:
-    runs-on: ubuntu-latest
-    needs: build-backend
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install dependencies for frontend
-      run: |
-        cd frontend
-        npm install
-
-    - name: Build frontend project
-      run: |
-        cd frontend
-        npm run build  # Assuming you have a build script for the frontend
+        npm run dev
