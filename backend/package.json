@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -27,5 +26,6 @@
     "eslint-plugin-react": "^7.34.3",
     "globals": "^15.8.0",
     "typescript-eslint": "^7.16.0"
-  }
+  },
+  "description": ""
 }
