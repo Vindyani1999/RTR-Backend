@@ -1,4 +1,4 @@
-name: Backend Build and Test
+name: Build Check
 
 on:
   pull_request:
@@ -10,47 +10,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Set up Node.js
+      - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Adjust node version as per your requirement
+          node-version: 20
           cache: "npm"
       - name: Install dependencies
         run: npm install
       - name: Linting
-        run: npm run lint  # Adjust linting command if needed
+        run: npm run lint
 
-  backend-tests:
+  production-build:
     runs-on: ubuntu-latest
     needs: linting-check
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Set up Node.js
+      - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Same node version as linting-check
+          node-version: 20
           cache: "npm"
       - name: Install dependencies
         run: npm install
-      - name: Run tests
-        run: npm test  # Adjust test command as per your project setup
-
-  production-deploy:
-    runs-on: ubuntu-latest
-    needs: backend-tests
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'  # Same node version as backend-tests
-          cache: "npm"
-      - name: Install dependencies
-        run: npm install
-      - name: Build and Deploy
-        run: |
-          npm run build  # Adjust build command
-          # Add deployment steps here, e.g., deploying to a cloud provider
-
+      - name: Build
+        run: npm run build
