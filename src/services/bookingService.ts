@@ -1,5 +1,6 @@
 import Table from "../models/Table";
 import Booking from "../models/Booking";
+import PastBooking from "../models/PastBooking";
 
 const bookTable = async (bookingData: any) => {
   const {
@@ -38,7 +39,7 @@ const bookTable = async (bookingData: any) => {
     tableType,
     tablePrice,
     numberOfChairs,
-    stableStatus: "Seated",
+    tableStatus: "Available", // Initially available before time
     date,
     startTime,
     endTime,
@@ -53,21 +54,61 @@ const bookTable = async (bookingData: any) => {
 
   await booking.save();
 
-  // Update the table status to 'Seated'
   const table = await Table.findOne({ id: tableNumber });
   if (table) {
-    table.status = "Seated"; // Mark table as seated
-    await table.save();
+    const currentTime = Date.now();
+    const bookingStartTime = new Date(`${date}T${startTime}`).getTime();
+    const bookingEndTime = new Date(`${date}T${endTime}`).getTime();
+    const fiveMinutesBeforeStart = bookingStartTime - 5 * 60 * 1000; // 5 minutes before start time
 
-    // Revert to 'Available' if unconfirmed after 2 minutes
+    // Step 1: Set table to "Pending" 5 minutes before the booking starts
     setTimeout(async () => {
-      const refreshedBooking = await Booking.findById(booking._id);
-      if (!refreshedBooking?.isConfirmed) {
-        table.status = "Available";
-        await table.save();
-        await Booking.findByIdAndDelete(booking._id); // Delete unconfirmed booking
+      const updatedTable = await Table.findOne({ id: tableNumber });
+      if (updatedTable) {
+        updatedTable.status = "Pending";
+        await updatedTable.save();
+        console.log(
+          "Table status changed to 'Pending' 5 minutes before booking starts."
+        );
+
+        // Step 2: Wait exactly 5 minutes (or less if start time arrives earlier), then check if it's time to set to "Seated"
+        const delay = Math.max(bookingStartTime - Date.now(), 2 * 60 * 1000); // If 5 minutes is shorter than the time left, we wait for 5 minutes, otherwise until the start time
+
+        setTimeout(async () => {
+          const tableDuringPending = await Table.findOne({ id: tableNumber });
+          const now = Date.now(); // Get current time
+          if (
+            tableDuringPending &&
+            tableDuringPending.status === "Pending" &&
+            now >= bookingStartTime &&
+            now < bookingEndTime
+          ) {
+            tableDuringPending.status = "Seated";
+            await tableDuringPending.save();
+            console.log("Table status changed to 'Seated' after 5 minutes.");
+          } else if (now >= bookingEndTime) {
+            console.log("Booking has already ended.");
+          }
+        }, delay); // Wait for either 5 minutes or the booking start time, whichever is shorter
       }
-    }, 2 * 60 * 1000); // 2 minutes
+    }, fiveMinutesBeforeStart - currentTime);
+
+    // Step 3: Set table to "Available" after the booking ends
+    setTimeout(async () => {
+      const updatedTable = await Table.findOne({ id: tableNumber });
+      if (updatedTable && currentTime >= bookingEndTime) {
+        updatedTable.status = "Available";
+        await updatedTable.save();
+
+        // Move booking to past bookings
+        const pastBookingRecord = new PastBooking({ ...booking.toObject() });
+        await pastBookingRecord.save();
+        await Booking.findByIdAndDelete(booking._id); // Clean up the booking
+        console.log(
+          "Booking moved to past bookings, and table status updated to 'Available'."
+        );
+      }
+    }, bookingEndTime - currentTime);
 
     return {
       success: true,
@@ -82,6 +123,7 @@ const bookTable = async (bookingData: any) => {
   }
 };
 
+// Check table availability
 const checkAvailability = async (
   tableNumber: number,
   date: string,
