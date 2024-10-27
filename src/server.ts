@@ -1,8 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
-import authRoutes from "./routes/authRoutes";
-//import bookingRoutes from "./routes/bookingRoutes";
+import bookingRoutes from "./routes/bookingRoutes";
 
 dotenv.config();
 
@@ -12,9 +11,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 
-// Routes
-app.use("/api/auth", authRoutes);
-//app.use("/api/bookings", bookingRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // MongoDB connection
 connectDB();
