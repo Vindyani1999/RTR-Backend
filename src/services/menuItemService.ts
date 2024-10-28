@@ -5,6 +5,13 @@ export const getAllMenuItems = async (): Promise<IMenuItem[]> => {
   return await MenuItem.find();
 };
 
+export const updateMenuItem = async (
+  id: string,
+  updateData: Partial<IMenuItem>
+): Promise<IMenuItem | null> => {
+  return await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
+};
+
 export const addMenuItem = async (
   title: string,
   price: number,
