@@ -4,6 +4,7 @@ import connectDB from "./config/db";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
 import pastBookingRoutes from "./routes/pastBookingRoutes";
+import tableRoutes from "./routes/tableRoutes";
 
 dotenv.config();
 
@@ -14,10 +15,11 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 // Routes
-//app.use("/api/auth", authRoutes);
+
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/menu", menuItemRoutes);
 app.use("/api/history", pastBookingRoutes);
+app.use("/api/table", tableRoutes);
 
 // MongoDB connection
 connectDB();
