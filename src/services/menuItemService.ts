@@ -12,6 +12,10 @@ export const updateMenuItem = async (
   return await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
 };
 
+export const deleteMenuItem = async (id: string): Promise<IMenuItem | null> => {
+  return await MenuItem.findByIdAndDelete(id);
+};
+
 export const addMenuItem = async (
   title: string,
   price: number,

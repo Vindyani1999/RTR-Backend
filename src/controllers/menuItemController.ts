@@ -64,3 +64,27 @@ export const updateMenuItem = async (
       .json({ success: false, message: "Error updating menu item", error });
   }
 };
+
+export const deleteMenuItem = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Call the service function to delete the menu item
+    const deletedItem = await menuItemService.deleteMenuItem(id);
+
+    if (deletedItem) {
+      res
+        .status(200)
+        .json({ success: true, message: "Menu item deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Menu item not found" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Error deleting menu item", error });
+  }
+};
