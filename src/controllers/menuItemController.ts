@@ -41,3 +41,26 @@ export const getAllMenuItems = async (
       .json({ success: false, message: "Error fetching menu items", error });
   }
 };
+
+export const updateMenuItem = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Call the service function to update the menu item
+    const updatedItem = await menuItemService.updateMenuItem(id, updateData);
+
+    if (updatedItem) {
+      res.status(200).json({ success: true, data: updatedItem });
+    } else {
+      res.status(404).json({ success: false, message: "Menu item not found" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Error updating menu item", error });
+  }
+};
