@@ -1,33 +1,42 @@
 import { Request, Response } from "express";
-import bookingService from "../services/bookingService";
+import * as bookingService from "../services/bookingService";
 
-export const bookTable = async (req: Request, res: Response): Promise<void> => {
+export const makeReservation = async (req: Request, res: Response) => {
   try {
-    const { tableNumber, startTime, endTime, date } = req.body;
-
-    // Check table availability based on the time slot
-    const isAvailable = await bookingService.checkAvailability(
-      tableNumber,
-      startTime,
-      endTime,
-      date
-    );
-
-    if (!isAvailable) {
-      res
-        .status(400)
-        .json({ message: "Table is not available for this time slot" });
-      return;
-    }
-
-    // Proceed with booking the table
-    const booking = await bookingService.bookTable(req.body);
-    res.status(201).json(booking);
+    const bookingData = req.body; // Validate this as per your requirements
+    const booking = await bookingService.createBooking(bookingData);
+    res.status(201).json({ message: "Booking created successfully", booking });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
-      return;
+    } else {
+      res.status(400).json({ message: "An unknown error occurred" });
     }
-    res.status(500).json({ message: "An unknown error occurred" });
+  }
+};
+
+export const handleExpiredBookings = async (req: Request, res: Response) => {
+  try {
+    await bookingService.updateExpiredBookings();
+    res.status(200).json({ message: "Expired bookings updated successfully." });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: "An unknown error occurred" });
+    }
+  }
+};
+
+export const getAllBookings = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const bookings = await bookingService.getAllBookingsService();
+    res.status(200).json({ success: true, data: bookings });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -5,6 +5,8 @@ import menuItemRoutes from "./routes/menuItemRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
 import pastBookingRoutes from "./routes/pastBookingRoutes";
 import tableRoutes from "./routes/tableRoutes";
+import cron from "node-cron";
+import { updateExpiredBookings } from "./services/bookingService";
 
 dotenv.config();
 
@@ -20,6 +22,15 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/menu", menuItemRoutes);
 app.use("/api/history", pastBookingRoutes);
 app.use("/api/table", tableRoutes);
+
+cron.schedule("* * * * *", async () => {
+  try {
+    console.log("Checking for expired bookings...");
+    await updateExpiredBookings();
+  } catch (error) {
+    console.error("Error updating expired bookings:", error);
+  }
+});
 
 // MongoDB connection
 connectDB();
