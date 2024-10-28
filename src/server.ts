@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
+import pastBookingRoutes from "./routes/pastBookingRoutes";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 //app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/menu", menuItemRoutes);
+app.use("/api/history", pastBookingRoutes);
 
 // MongoDB connection
 connectDB();
