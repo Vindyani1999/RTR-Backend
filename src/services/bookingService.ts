@@ -8,7 +8,7 @@ export const createBooking = async (
   // Check for overlapping bookings
   const overlappingBooking = await Booking.findOne({
     tableNumber: bookingData.tableNumber,
-    date: bookingData.date,
+    date: bookingData.selectedDate,
     $or: [
       {
         startTime: { $lt: bookingData.endTime },
