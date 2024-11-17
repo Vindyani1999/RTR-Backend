@@ -1,15 +1,15 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IMenuItem extends Document {
-  title: string;
+  name: string;
   price: number;
   description: string;
-  categories: string[];
+  category: string[];
   image: string;
 }
 
 const MenuItemSchema: Schema = new Schema({
-  title: {
+  name: {
     type: String,
     required: true,
   },
@@ -21,7 +21,7 @@ const MenuItemSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  categories: {
+  category: {
     type: [String],
     required: true,
   },
